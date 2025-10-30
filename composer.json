@@ -1,0 +1,40 @@
+{
+    "name": "leandrose/laravel-event-driven",
+    "description": "A lightweight, extensible event-driven architecture package for PHP applications. It provides unified interfaces for publishing, consuming, and managing events using Kafka.",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "LeandroSe\\LaravelEventDriven\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LeandroSe\\LaravelEventDriven\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "leandrose",
+            "email": "ltsujiguchi@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-rdkafka": "*",
+        "illuminate/contracts": "^10|^11|^12",
+        "illuminate/support": "^10|^11|^12",
+        "illuminate/database": "^10|^11|^12",
+        "illuminate/console": "^10|^11|^12"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0",
+        "phpunit/phpunit": "^10|^11|^12"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LeandroSe\\LaravelEventDriven\\ServiceProvider"
+            ]
+        }
+    }
+}
