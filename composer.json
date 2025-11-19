@@ -20,6 +20,7 @@
     ],
     "require": {
         "php": "^8.1",
+        "ext-pcntl": "*",
         "ext-rdkafka": "*",
         "illuminate/contracts": "^10|^11|^12",
         "illuminate/support": "^10|^11|^12",

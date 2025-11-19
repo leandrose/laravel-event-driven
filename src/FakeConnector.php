@@ -51,6 +51,15 @@ class FakeConnector implements ConnectorContract
     }
 
     /**
+     * Get the name of the connector.
+     * @return string
+     **/
+    public function driverName(): string
+    {
+        return 'fake';
+    }
+
+    /**
      * Number of messages currently stored in memory.
      *
      * @return int

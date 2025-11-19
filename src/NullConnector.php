@@ -43,4 +43,13 @@ class NullConnector implements ConnectorContract
     {
         return true;
     }
+
+    /**
+     * Get the name of the connector.
+     * @return string
+     **/
+    public function driverName(): string
+    {
+        return 'null';
+    }
 }

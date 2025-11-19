@@ -35,4 +35,11 @@ interface ConnectorContract
      * @return ConsumerContract Consumer ready to be executed.
      */
     public function consumer(mixed $topic, array $arguments = []): ConsumerContract;
+
+    /**
+     * Get the name of the driver.
+     *
+     * @return string The name of the driver.
+     */
+    public function driverName(): string;
 }

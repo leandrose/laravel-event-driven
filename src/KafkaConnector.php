@@ -78,8 +78,34 @@ class KafkaConnector implements ConnectorContract
         $conf->set('metadata.broker.list', $this->bootstrapServer);
         $conf->set('enable.partition.eof', 'true');
         $conf->set('auto.offset.reset', 'latest');
+        $conf->set('enable.auto.commit', 'true');
+        $conf->set('enable.auto.offset.store', 'true');
+//        $conf->setRebalanceCb(function (RdKafka\KafkaConsumer $kafka, $err, array $partitions = null) {
+//            switch ($err) {
+//                case RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS:
+//                    echo "Partições atribuídas: " . json_encode($partitions) . PHP_EOL;
+//                    $kafka->assign($partitions);
+//                    break;
+//                case RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS:
+//                    echo "Partições revogadas\n";
+//                    $kafka->assign(null);
+//                    break;
+//                default:
+//                    echo "nada";
+//                    break;
+//            }
+//        });
 
         $consumer = new RdKafka\KafkaConsumer($conf);
         return new KafkaConsumer($consumer, $topic);
+    }
+
+    /**
+     * Get the name of the connector.
+     * @return string
+     **/
+    public function driverName(): string
+    {
+        return 'kafka';
     }
 }

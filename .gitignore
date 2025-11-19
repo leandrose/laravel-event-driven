@@ -17,3 +17,4 @@ yarn-error.log
 /.phpstorm.meta.php
 /storage/nfcom_vault
 /storage/nfcom_vault.pub
+composer.lock

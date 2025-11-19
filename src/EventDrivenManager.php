@@ -36,7 +36,7 @@ class EventDrivenManager
      * @see EventDrivenManager::createKafkaDriver()
      * @see EventDrivenManager::createNullDriver()
      */
-    public function connector(string $name = null): ConnectorContract
+    public function connection(string $name = null): ConnectorContract
     {
         $name = $name ?? $this->getDefaultDriver();
 

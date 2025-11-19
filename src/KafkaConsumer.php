@@ -4,6 +4,7 @@ namespace LeandroSe\LaravelEventDriven;
 
 use JsonException;
 use RdKafka;
+use RdKafka\Exception;
 
 /**
  * Consumer wrapper around {@see RdKafka\KafkaConsumer} that adapts messages to the package format.
@@ -24,16 +25,18 @@ class KafkaConsumer implements ConsumerContract
      * Subscribe to the configured topics and continuously consume messages.
      *
      * @param callable $callback Invoked for each received {@see Message}.
+     * @param bool $isRunning Flag indicating whether the consumer is currently running.
      * @return void
      *
      * @throws JsonException When decoding the payload fails.
+     * @throws Exception
      */
-    public function run(callable $callback)
+    public function run(callable $callback, bool &$isRunning)
     {
         $this->consumer->subscribe($this->topics);
 
-        while (true) {
-            $message = $this->consumer->consume(30 * 1000);
+        while ($isRunning) {
+            $message = $this->consumer->consume(500);
             switch ($message->err) {
                 case RD_KAFKA_RESP_ERR_NO_ERROR:
                     $msg = new Message($message->topic_name, json_decode($message->payload, true, JSON_THROW_ON_ERROR));
@@ -44,6 +47,7 @@ class KafkaConsumer implements ConsumerContract
                     usleep(100000);
                     break;
             }
+            $this->consumer->commitAsync();
         }
     }
 }

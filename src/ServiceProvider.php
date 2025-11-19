@@ -4,7 +4,10 @@ namespace LeandroSe\LaravelEventDriven;
 
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-use LeandroSe\LaravelEventDriven\Console\Commands\OutboxEvents\WorkerCommand;
+use LeandroSe\LaravelEventDriven\Console\Commands\EventDrivenCommand;
+use LeandroSe\LaravelEventDriven\Console\Commands\OutboxEventWorkerCommand;
+use LeandroSe\LaravelEventDriven\Console\Commands\SupervisorCommand;
+use LeandroSe\LaravelEventDriven\Console\Commands\WorkerCommand;
 
 /**
  * Laravel service provider that wires the package into an application.
@@ -39,10 +42,10 @@ class ServiceProvider extends LaravelServiceProvider
             return $this->app['event-driven'];
         });
         $this->app->singleton('event-driven.driver', function () {
-            return $this->app['event-driven']->connector();
+            return $this->app['event-driven']->connection();
         });
         $this->app->bind(ConnectorContract::class, function () {
-            return $this->app['event-driven']->connector();
+            return $this->app['event-driven']->connection();
         });
         $this->mergeConfigFrom(__DIR__ . '/../config/event-driven.php', 'event-driven');
     }
@@ -71,7 +74,10 @@ class ServiceProvider extends LaravelServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
+                EventDrivenCommand::class,
+                SupervisorCommand::class,
                 WorkerCommand::class,
+                OutboxEventWorkerCommand::class,
             ]);
         }
     }

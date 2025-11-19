@@ -1,6 +1,6 @@
 <?php
 
-namespace LeandroSe\LaravelEventDriven\Console\Commands\OutboxEvents;
+namespace LeandroSe\LaravelEventDriven\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -12,7 +12,7 @@ use LeandroSe\LaravelEventDriven\Models\OutboxEvent;
 /**
  * Artisan worker that drains the outbox table and forwards events to the configured connector.
  */
-class WorkerCommand extends Command
+class OutboxEventWorkerCommand extends Command
 {
 
     protected $signature = 'event-driven:outbox

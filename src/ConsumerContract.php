@@ -12,7 +12,8 @@ interface ConsumerContract
      * Start consuming messages and forward them to the provided callback.
      *
      * @param callable $callback Callback that receives a {@see Message} instance for each consumed event.
+     * @param bool $isRunning Flag indicating whether the consumer is currently running.
      * @return mixed Connector-specific return value (usually void). Implementations are allowed to run indefinitely.
      */
-    public function run(callable $callback);
+    public function run(callable $callback, bool &$isRunning);
 }
