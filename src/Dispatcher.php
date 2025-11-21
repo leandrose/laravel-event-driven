@@ -2,6 +2,7 @@
 
 namespace LeandroSe\LaravelEventDriven;
 
+use DateTimeInterface;
 use Illuminate\Events\Dispatcher as LaravelDispatcher;
 use LeandroSe\LaravelEventDriven\Models\OutboxEvent;
 
@@ -29,7 +30,7 @@ class Dispatcher extends LaravelDispatcher
                 OutboxEvent::insertByDomainEvent($event);
             } else {
                 resolve('event-driven.driver')->push($event->name(), array_merge(
-                    ['event_id' => $event->eventId, 'occurred_at' => $event->occurredAt, 'version' => $event->version],
+                    ['event_id' => $event->eventId, 'occurred_at' => $event->occurredAt->format(DateTimeInterface::RFC3339), 'version' => $event->version],
                     $event->payload()
                 ));
             }
