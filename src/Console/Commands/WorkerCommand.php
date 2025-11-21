@@ -14,6 +14,8 @@ use LeandroSe\LaravelEventDriven\InvalidArgumentException;
 use LeandroSe\LaravelEventDriven\KafkaConnector;
 use LeandroSe\LaravelEventDriven\Message;
 use LeandroSe\LaravelEventDriven\NullConnector;
+use ReflectionClass;
+use ReflectionNamedType;
 
 class WorkerCommand extends Command
 {
@@ -48,10 +50,18 @@ class WorkerCommand extends Command
 
         $connection = $eventDriven->connection($this->option('connection') ?? config('event-driven.default'));
         $consumer = $this->instanceByDriver($connection);
-        $consumer->run(function (Message $msg) {
+        $listeners = config('event-driven.listeners');
+        $consumer->run(function (Message $msg) use ($listeners) {
             $this->printRunning($msg);
             try {
-                sleep(1);
+                if (isset($listeners[$msg->topic])) {
+                    foreach ($listeners[$msg->topic] as $listener) {
+                        if ($this->isValidHandler($listener)) {
+                            $listen = app($listener);
+                            $listen->handle($msg);
+                        }
+                    }
+                }
                 $this->printSuccess($msg);
             } catch (Exception) {
                 $this->printError($msg);
@@ -61,13 +71,35 @@ class WorkerCommand extends Command
         $this->info(sprintf('Worker "%s" has finished', $this->argument('name')));
     }
 
+    protected function isValidHandler(string $class): bool
+    {
+        if (!class_exists($class)) {
+            return false;
+        }
+        $ref = new ReflectionClass($class);
+        if (!$ref->hasMethod('handle')) {
+            return false;
+        }
+        $method = $ref->getMethod('handle');
+        $params = $method->getParameters();
+        if (count($params) == 0) {
+            return false;
+        }
+        $type = $params[0]->getType();
+        if (!$type instanceof ReflectionNamedType) {
+            return false;
+        }
+        return $type->getName() === Message::class;
+    }
+
     /**
      * Build a new consumer by driver.
      *
      * @throws EventDrivenException
      * @throws InvalidArgumentException
      */
-    public function instanceByDriver(ConnectorContract $connector)
+    public
+    function instanceByDriver(ConnectorContract $connector)
     {
         $topics = $this->option('topics');
         if (empty($topics)) {

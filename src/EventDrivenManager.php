@@ -27,6 +27,27 @@ class EventDrivenManager
     }
 
     /**
+     * Register a listener for a given event.
+     * @param string $eventName Event name.
+     * @param string $listen Listener class name.
+     * @return void
+     */
+    public function listen(string $eventName, string $listen): void
+    {
+        if (!class_exists($listen)) {
+            return;
+        }
+
+        if (empty(config('event-driven.listeners.' . $eventName))) {
+            config(['event-driven.listeners.' . $eventName => [$listen]]);
+        } else {
+            $listeners = config('event-driven.listeners.' . $eventName);
+            $listeners[] = $listen;
+            config(['event-driven.listeners.' . $eventName => array_unique($listeners)]);
+        }
+    }
+
+    /**
      * Retrieve a connector by name or fall back to the default connection.
      *
      * @param string|null $name Optional connection name defined under `event-driven.connections`.

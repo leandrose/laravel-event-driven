@@ -22,6 +22,8 @@ abstract class DomainEvent
      */
     public DateTimeImmutable $occurredAt;
 
+    public int $version = 1;
+
     /**
      * Initialise the event with a unique identifier and occurrence timestamp.
      */
