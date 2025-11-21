@@ -28,7 +28,10 @@ class Dispatcher extends LaravelDispatcher
             if ($this->container['config']['event-driven.outbox_event']) {
                 OutboxEvent::insertByDomainEvent($event);
             } else {
-                resolve('event-driven.driver')->push($event->name(), $event->payload());
+                resolve('event-driven.driver')->push($event->name(), array_merge(
+                    ['event_id' => $event->eventId, 'occurred_at' => $event->occurredAt, 'version' => $event->version],
+                    $event->payload()
+                ));
             }
         }
         return parent::dispatch($event, $payload, $halt);
