@@ -19,20 +19,14 @@ return [
     ],
 
     'supervisors' => [
-        'clients_kafka' => [
-            'connection' => 'kafka',
-            'topics' => ['client.create', 'client.update', 'client.delete'],
-            'backoff' => 30,
-
-            'instances' => 3,
-            'group.id' => 'clientes',
-        ],
-        'provedores_kafka' => [
-            'connection' => 'kafka',
-            'topics' => ['provedores.servidores.status'],
-            'instances' => 2,
-            'group.id' => 'provedores',
-        ],
+//        'clients_kafka' => [
+//            'connection' => 'kafka',
+//            'topics' => ['client.create', 'client.update', 'client.delete'],
+//            'backoff' => 30,
+//
+//            'instances' => 3,
+//            'group.id' => 'clientes',
+//        ],
     ],
 
     'listeners' => [
