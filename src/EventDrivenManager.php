@@ -28,22 +28,26 @@ class EventDrivenManager
 
     /**
      * Register a listener for a given event.
-     * @param string $eventName Event name.
-     * @param string $listen Listener class name.
+     * @param string|array $eventName Event name.
+     * @param string|array $listens Listener class name.
      * @return void
      */
-    public function listen(string $eventName, string $listen): void
+    public function listen(string|array $eventName, string|array $listens): void
     {
-        if (!class_exists($listen)) {
+        $eventName = is_string($eventName) ? [$eventName] : $eventName;
+        $listens = array_filter(is_string($listens) ? [$listens] : $listens, fn($item) => class_exists($item));
+        if (!count($listens)) {
             return;
         }
 
-        if (empty(config('event-driven.listeners.' . $eventName))) {
-            config(['event-driven.listeners.' . $eventName => [$listen]]);
-        } else {
-            $listeners = config('event-driven.listeners.' . $eventName);
-            $listeners[] = $listen;
-            config(['event-driven.listeners.' . $eventName => array_unique($listeners)]);
+        foreach ($eventName as $event) {
+            if (empty(config('event-driven.listeners.' . $event))) {
+                config(['event-driven.listeners.' . $event => $listens]);
+            } else {
+                $listeners = config('event-driven.listeners.' . $event);
+                $listeners = array_unique(array_merge($listeners, $listens));
+                config(['event-driven.listeners.' . $event => $listeners]);
+            }
         }
     }
 
