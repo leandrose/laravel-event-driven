@@ -50,12 +50,12 @@ class WorkerCommand extends Command
 
         $connection = $eventDriven->connection($this->option('connection') ?? config('event-driven.default'));
         $consumer = $this->instanceByDriver($connection);
-        $listeners = config('event-driven.listeners');
-        $consumer->run(function (Message $msg) use ($listeners) {
+        $consumer->run(function (Message $msg) {
             $this->printRunning($msg);
+            $listeners = config('event-driven.listeners.' . $msg->topic, []);
             try {
-                if (isset($listeners[$msg->topic])) {
-                    foreach ($listeners[$msg->topic] as $listener) {
+                if ($listeners && is_array($listeners)) {
+                    foreach ($listeners as $listener) {
                         if ($this->isValidHandler($listener)) {
                             $listen = app($listener);
                             $listen->handle($msg);
