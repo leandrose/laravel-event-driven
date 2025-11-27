@@ -4,6 +4,7 @@ namespace LeandroSe\LaravelEventDriven;
 
 use DateTimeInterface;
 use Illuminate\Events\Dispatcher as LaravelDispatcher;
+use JsonException;
 use LeandroSe\LaravelEventDriven\Models\OutboxEvent;
 
 /**
@@ -25,15 +26,24 @@ class Dispatcher extends LaravelDispatcher
      */
     public function dispatch($event, $payload = [], $halt = false): ?array
     {
-        if ($event instanceof DomainEvent) {
-            if ($this->container['config']['event-driven.outbox_event']) {
-                OutboxEvent::insertByDomainEvent($event);
-            } else {
-                resolve('event-driven.driver')->push($event->name(), array_merge(
-                    ['event_id' => $event->eventId, 'occurred_at' => $event->occurredAt->format(DateTimeInterface::RFC3339), 'version' => $event->version],
-                    $event->payload()
-                ));
+        try {
+            if ($event instanceof DomainEvent) {
+                if ($this->container['config']['event-driven.outbox_event']) {
+                    OutboxEvent::insertByDomainEvent($event);
+                } else {
+                    resolve('event-driven.driver')->push(
+                        $event->name(),
+                        [
+                            'event_id' => $event->eventId,
+                            'occurred_at' => $event->occurredAt->format(DateTimeInterface::RFC3339),
+                            'version' => $event->version,
+                            'payload' => $event->payload(),
+                        ],
+                    );
+                }
             }
+        } catch (JsonException $e) {
+            report($e);
         }
         return parent::dispatch($event, $payload, $halt);
     }

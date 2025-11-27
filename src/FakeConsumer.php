@@ -19,12 +19,17 @@ class FakeConsumer implements ConsumerContract
      * Invoke the callback for each queued message.
      *
      * @param callable $callback
+     * @param bool &$isRunning
      * @return void
      */
-    public function run(callable $callback)
+    public function run(callable $callback, bool &$isRunning)
     {
         foreach ($this->messages as $message) {
-            $callback(new Message($message['topic'], $message['payload']));
+            if (!$isRunning) {
+                return;
+            }
+            $payload = $message['payload'];
+            $callback(new Message($message['topic'], $payload['event_id'], $payload['occurred_at'], $payload['version'], $message['payload']));
         }
     }
 }

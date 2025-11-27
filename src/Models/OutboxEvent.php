@@ -3,6 +3,7 @@
 namespace LeandroSe\LaravelEventDriven\Models;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use JsonException;
@@ -41,7 +42,12 @@ class OutboxEvent extends Model
     {
         $new = new OutboxEvent();
         $new->event_name = $event->name();
-        $new->payload = json_encode($event->payload(), JSON_THROW_ON_ERROR);
+        $new->payload = json_encode([
+            'event_id' => $event->eventId,
+            'occurred_at' => $event->occurredAt->format(DateTimeInterface::RFC3339),
+            'version' => $event->version,
+            'payload' => $event->payload(),
+        ], JSON_THROW_ON_ERROR);
         $new->occurred_at = $event->occurredAt;
         $new->save();
 

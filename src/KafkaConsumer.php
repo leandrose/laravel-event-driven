@@ -2,6 +2,8 @@
 
 namespace LeandroSe\LaravelEventDriven;
 
+use DateTime;
+use DateTimeInterface;
 use JsonException;
 use RdKafka;
 use RdKafka\Exception;
@@ -39,7 +41,14 @@ class KafkaConsumer implements ConsumerContract
             $message = $this->consumer->consume(500);
             switch ($message->err) {
                 case RD_KAFKA_RESP_ERR_NO_ERROR:
-                    $msg = new Message($message->topic_name, json_decode($message->payload, true, JSON_THROW_ON_ERROR));
+                    $payload = json_decode($message->payload, true, JSON_THROW_ON_ERROR);
+                    $msg = new Message(
+                        $message->topic_name,
+                        $payload['event_id'],
+                        DateTime::createFromFormat(DateTimeInterface::RFC3339, $payload['occurred_at']),
+                        $payload['version'],
+                        $payload['payload'],
+                    );
                     $callback($msg);
                     break;
                 case RD_KAFKA_RESP_ERR__PARTITION_EOF:
